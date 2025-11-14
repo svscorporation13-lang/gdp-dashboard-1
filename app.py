@@ -98,16 +98,21 @@ values = [
     infl.iloc[-1] if infl is not None else 0.5,
 ]
 
+df = pd.concat(
+    [
+        econ.rename("economic"),
+        legit.rename("legitimacy"),
+        stability.rename("stability"),
+    ],
+    axis=1,
+)
 
-    df = pd.concat([econ.rename("economic"), legit.rename("legitimacy"), stability.rename("stability")], axis=1)
-
-    df["composite"] = df.mean(axis=1)
-
-    results[c] = df
+df["composite"] = df.mean(axis=1)
+results[c] = df
 
 st.header("Composite Score Comparison")
 
-comp = pd.concat({k: v["composite"] for k,v in results.items()}, axis=1)
+comp = pd.concat({k: v["composite"] for k, v in results.items()}, axis=1)
 st.line_chart(comp)
 
 for c, df in results.items():
