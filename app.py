@@ -46,17 +46,17 @@ def fetch_trends(iso):
     except:
         return None
 
-def scale(s, inverse=False):
-    s = s.dropna()
-    if s.empty: return s
-    low, high = s.min(), s.max()
+def scale(series, inverse=False):
+    low = series.min()
+    high = series.max()
+
+    # NEW: prevent division by zero when high == low
     if high == low:
-        out = pd.Series(5, index=s.index)
-    else:
-        out = (s - low) / (high - low) * 10
-    if inverse:
-        out = 10 - out
-    return out
+        return pd.Series([0.5] * len(series), index=series.index)
+
+    scaled = (series - low) / (high - low)
+    return 1 - scaled if inverse else scaled
+
 
 st.title("Authoritarian Regime Effectiveness — Lite Dashboard")
 
