@@ -77,9 +77,27 @@ for c in sel:
     if gdp is not None: gdp = gdp[gdp.index >= pd.to_datetime(start)]
     if tr is not None: tr = tr[tr.index >= pd.to_datetime(start)]
 
-    econ = scale(-fx, inverse=False) if fx is not None else None
-    legit = scale(-tr, inverse=False) if tr is not None else None
-    stability = scale(gdp, inverse=False) if gdp is not None else None
+# SAFE WRAPPER – prevents errors when a dataset has only 1 value
+def safe_scale(series, inverse=False):
+    if series is None or len(series) <= 1:
+        return None
+    return scale(series, inverse=inverse)
+
+# Apply scaling safely
+gov = safe_scale(gov)
+econ = safe_scale(-fx, inverse=False)
+corr = safe_scale(-corruption, inverse=False)
+gdp_s = safe_scale(gdp)
+infl = safe_scale(-inflation, inverse=True)
+
+values = [
+    gov.iloc[-1] if gov is not None else 0.5,
+    econ.iloc[-1] if econ is not None else 0.5,
+    corr.iloc[-1] if corr is not None else 0.5,
+    gdp_s.iloc[-1] if gdp_s is not None else 0.5,
+    infl.iloc[-1] if infl is not None else 0.5,
+]
+
 
     df = pd.concat([econ.rename("economic"), legit.rename("legitimacy"), stability.rename("stability")], axis=1)
 
