@@ -133,11 +133,11 @@ for c in sel:
 
     # Latest values (for radar/panel)
     values = [
-        gov_s.iloc[-1] if gov_s is not None else 0.5,
-        econ_s.iloc[-1] if econ_s is not None else 0.5,
-        corr_s.iloc[-1] if corr_s is not None else 0.5,
-        gdp_s.iloc[-1] if gdp_s is not None else 0.5,
-        infl_s.iloc[-1] if infl_s is not None else 0.5,
+        gov_s  = safe_scale(gov)
+econ_s = safe_scale(-fx)
+infl_s = safe_scale(infl, inverse=True)
+corr_s = safe_scale(corr)
+
     ]
 
     df = pd.concat(
