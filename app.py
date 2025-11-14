@@ -59,19 +59,35 @@ def fetch_trends(iso):
 # ---------------------------------------------------------
 
 def scale(series, inverse=False):
-    low = series.min()
-    high = series.max()
+    # ensure valid numeric series
+    if series is None:
+        return None
+    if not isinstance(series, pd.Series):
+        return None
+    if series.empty:
+        return None
+    if len(series.dropna()) == 0:
+        return None
 
-    if high == low:
-        return pd.Series([0.5] * len(series), index=series.index)
+    s = series.astype(float)
 
-    scaled = (series - low) / (high - low)
+    low = float(s.min())
+    high = float(s.max())
+
+    # avoid division by zero
+    if abs(high - low) < 1e-9:
+        return pd.Series([0.5] * len(s), index=s.index)
+
+    scaled = (s - low) / (high - low)
     return 1 - scaled if inverse else scaled
 
-def safe(series, inverse=False):
-    if series is None or len(series) <= 1:
+
+def safe_scale(series, inverse=False):
+    try:
+        result = scale(series, inverse=inverse)
+        return result
+    except Exception:
         return None
-    return scale(series, inverse=inverse)
 
 # ---------------------------------------------------------
 # UI
